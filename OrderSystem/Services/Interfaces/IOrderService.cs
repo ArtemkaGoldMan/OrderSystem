@@ -14,5 +14,6 @@ namespace OrderSystem.Services.Interfaces
         void SendToShipping(int orderId);
         void ViewOrders();
         void CancelOrder(int orderId);
+        void ShowCompactOrderList();
     }
 }

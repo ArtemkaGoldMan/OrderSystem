@@ -21,7 +21,7 @@ namespace OrderSystem.Data.Implementations
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error adding order: {ex.Message}");
+                Console.WriteLine($"Error adding order: {ex.Message}");
             }
         }
 
@@ -33,7 +33,7 @@ namespace OrderSystem.Data.Implementations
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error fetching order by ID: {ex.Message}");
+                Console.WriteLine($"Error fetching order by ID: {ex.Message}");
                 return null;
             }
         }
@@ -46,7 +46,7 @@ namespace OrderSystem.Data.Implementations
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error fetching orders: {ex.Message}");
+                Console.WriteLine($"Error fetching orders: {ex.Message}");
                 return new List<Order>();
             }
         }
@@ -60,7 +60,7 @@ namespace OrderSystem.Data.Implementations
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error updating order: {ex.Message}");
+                Console.WriteLine($"Error updating order: {ex.Message}");
             }
         }
     }

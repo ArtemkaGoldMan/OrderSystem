@@ -61,7 +61,7 @@ class Program
                 case "6":
                     return;
                 default:
-                    Console.WriteLine("❌ Invalid choice, try again.");
+                    Console.WriteLine("!!!Invalid choice, try again.");
                     break;
             }
         }
@@ -76,64 +76,95 @@ class Program
         decimal amount;
         while (!decimal.TryParse(Console.ReadLine(), out amount) || amount <= 0)
         {
-            Console.Write("❌ Invalid amount. Enter a positive number: ");
+            Console.Write("!!!Invalid amount. Enter a positive number: ");
         }
 
         Console.Write("Enter customer type (1 - Individual, 2 - Company): ");
         CustomerType customerType;
-        while (!Enum.TryParse(Console.ReadLine(), out customerType) || !Enum.IsDefined(typeof(CustomerType), customerType))
+        string customerInput = Console.ReadLine();
+        while (true)
         {
-            Console.Write("❌ Invalid choice. Enter 1 for Individual or 2 for Company: ");
+            if (customerInput == "1")
+            {
+                customerType = CustomerType.Individual;
+                break;
+            }
+            else if (customerInput == "2")
+            {
+                customerType = CustomerType.Company;
+                break;
+            }
+            Console.Write("!!!Invalid choice. Enter 1 for Individual or 2 for Company: ");
+            customerInput = Console.ReadLine();
         }
+
 
         Console.Write("Enter delivery address: ");
         string address = Console.ReadLine();
 
         Console.Write("Enter payment method (1 - Card, 2 - Cash on Delivery): ");
         PaymentMethod paymentMethod;
-        while (!Enum.TryParse(Console.ReadLine(), out paymentMethod) || !Enum.IsDefined(typeof(PaymentMethod), paymentMethod))
+        string paymentInput = Console.ReadLine();
+        while (true)
         {
-            Console.Write("❌ Invalid choice. Enter 1 for Card or 2 for Cash on Delivery: ");
+            if (paymentInput == "1")
+            {
+                paymentMethod = PaymentMethod.Card;
+                break;
+            }
+            else if (paymentInput == "2")
+            {
+                paymentMethod = PaymentMethod.CashOnDelivery;
+                break;
+            }
+            Console.Write("!!!Invalid choice. Enter 1 for Card or 2 for Cash on Delivery: ");
+            paymentInput = Console.ReadLine();
         }
 
         _orderService.CreateOrder(productName, amount, customerType, address, paymentMethod);
-        Console.WriteLine("✔ Order created successfully! Press any key to continue...");
+        Console.WriteLine("Order created successfully! Press any key to continue...");
         Console.ReadKey();
     }
 
     static void SendToWarehouse()
     {
+        _orderService.ShowCompactOrderList();
+
         Console.Write("Enter order ID: ");
         int orderId;
         while (!int.TryParse(Console.ReadLine(), out orderId))
         {
-            Console.Write("❌ Invalid order ID. Enter a valid number: ");
+            Console.Write("!!!Invalid order ID. Enter a valid number: ");
         }
         _orderService.SendToWarehouse(orderId);
-        Console.WriteLine("✔ Process completed. Press any key to continue...");
+        Console.WriteLine("Process completed. Press any key to continue...");
         Console.ReadKey();
     }
 
     static void SendToShipping()
     {
+        _orderService.ShowCompactOrderList();
+
         Console.Write("Enter order ID: ");
         int orderId;
         while (!int.TryParse(Console.ReadLine(), out orderId))
         {
-            Console.Write("❌ Invalid order ID. Enter a valid number: ");
+            Console.Write("!!!Invalid order ID. Enter a valid number: ");
         }
         _orderService.SendToShipping(orderId);
-        Console.WriteLine("✔ Process completed. Press any key to continue...");
+        Console.WriteLine("Process completed. Press any key to continue...");
         Console.ReadKey();
     }
 
     static void CancelOrder()
     {
+        _orderService.ShowCompactOrderList();
+
         Console.Write("Enter order ID to cancel: ");
         int orderId;
         while (!int.TryParse(Console.ReadLine(), out orderId))
         {
-            Console.Write("❌ Invalid order ID. Enter a valid number: ");
+            Console.Write("!!!Invalid order ID. Enter a valid number: ");
         }
         _orderService.CancelOrder(orderId);
         Console.WriteLine("Press any key to continue...");
