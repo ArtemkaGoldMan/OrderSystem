@@ -13,6 +13,7 @@ namespace OrderSystem.Models
         InShipping,
         ReturnedToCustomer,
         Error,
-        Closed
+        Closed,
+        Cancelled
     }
 }

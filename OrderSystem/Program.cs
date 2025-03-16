@@ -33,7 +33,8 @@ class Program
             Console.WriteLine("2 Send Order to Warehouse");
             Console.WriteLine("3 Send Order to Shipping");
             Console.WriteLine("4 View Orders");
-            Console.WriteLine("5 Exit");
+            Console.WriteLine("5 Cancel Order");
+            Console.WriteLine("6 Exit");
             Console.Write("Choose an option: ");
 
             var choice = Console.ReadLine();
@@ -55,6 +56,9 @@ class Program
                     Console.ReadKey();
                     break;
                 case "5":
+                    CancelOrder();
+                    break;
+                case "6":
                     return;
                 default:
                     Console.WriteLine("❌ Invalid choice, try again.");
@@ -120,6 +124,19 @@ class Program
         }
         _orderService.SendToShipping(orderId);
         Console.WriteLine("✔ Process completed. Press any key to continue...");
+        Console.ReadKey();
+    }
+
+    static void CancelOrder()
+    {
+        Console.Write("Enter order ID to cancel: ");
+        int orderId;
+        while (!int.TryParse(Console.ReadLine(), out orderId))
+        {
+            Console.Write("❌ Invalid order ID. Enter a valid number: ");
+        }
+        _orderService.CancelOrder(orderId);
+        Console.WriteLine("Press any key to continue...");
         Console.ReadKey();
     }
 }

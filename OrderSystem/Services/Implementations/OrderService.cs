@@ -113,6 +113,30 @@ namespace OrderSystem.Services.Implementations
             }
         }
 
+        public void CancelOrder(int orderId)
+        {
+            var order = _orderRepository.GetOrderById(orderId);
+            if (order == null)
+            {
+                Console.WriteLine("❌ Error: Order not found.");
+                return;
+            }
 
+            if (order.Status == OrderStatus.Closed || order.Status == OrderStatus.Cancelled)
+            {
+                Console.WriteLine("❌ Error: Cannot cancel order that is already closed or cancelled.");
+                return;
+            }
+
+            if (order.Status == OrderStatus.InShipping)
+            {
+                Console.WriteLine("❌ Error: Cannot cancel order that is already in shipping.");
+                return;
+            }
+
+            order.Status = OrderStatus.Cancelled;
+            _orderRepository.UpdateOrder(order);
+            Console.WriteLine("✔ Order cancelled successfully!");
+        }
     }
 }

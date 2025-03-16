@@ -13,5 +13,6 @@ namespace OrderSystem.Services.Interfaces
         void SendToWarehouse(int orderId);
         void SendToShipping(int orderId);
         void ViewOrders();
+        void CancelOrder(int orderId);
     }
 }
