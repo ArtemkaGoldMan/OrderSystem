@@ -5,6 +5,7 @@ namespace OrderSystem.Data
 {
     public class DatabaseContext : DbContext
     {
+        public DatabaseContext() { }
         public DbSet<Order> Orders { get; set; }
 
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
@@ -13,7 +14,13 @@ namespace OrderSystem.Data
         {
             if (!options.IsConfigured)
             {
-                options.UseSqlite("Data Source=orders.db");
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+
+                string projectDir = Path.GetFullPath(Path.Combine(baseDir, "..\\..\\.."));
+
+                string dbPath = Path.Combine(projectDir, "orders.db");
+
+                options.UseSqlite($"Data Source={dbPath}");
             }
         }
 
