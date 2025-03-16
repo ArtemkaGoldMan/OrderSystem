@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace OrderSystem.Services.Implementations
 {
-    internal class OrderService : IOrderService
+    public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
 
