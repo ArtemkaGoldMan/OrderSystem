@@ -9,7 +9,7 @@ namespace OrderSystem.Services.Interfaces
 {
     public interface IOrderService
     {
-        void CreateOrder(Order order);
+        void CreateOrder(string productName, decimal amount, CustomerType customer, string deliveryAddress, PaymentMethod payment);
         void SendToWarehouse(int orderId);
         void SendToShipping(int orderId);
         void ViewOrders();

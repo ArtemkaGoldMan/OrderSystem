@@ -1,4 +1,5 @@
 ﻿using OrderSystem.Data.Interfaces;
+using OrderSystem.Factories.Interfaces;
 using OrderSystem.Models;
 using OrderSystem.Services.Interfaces;
 using System;
@@ -12,37 +13,41 @@ namespace OrderSystem.Services.Implementations
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
+        private readonly IOrderFactory _orderFactory;
 
-        public OrderService(IOrderRepository orderRepository)
+        public OrderService(IOrderRepository orderRepository, IOrderFactory orderFactory)
         {
             _orderRepository = orderRepository;
+            _orderFactory = orderFactory;
         }
 
-        public void CreateOrder(Order order)
+        public void CreateOrder(string productName, decimal amount, CustomerType customer, string deliveryAddress, PaymentMethod payment)
         {
-            if (string.IsNullOrWhiteSpace(order.ProductName))
+            if (string.IsNullOrWhiteSpace(productName))
             {
                 Console.WriteLine("❌ Error: Product name is required.");
                 return;
             }
 
-            if (order.Amount <= 0)
+            if (amount <= 0)
             {
                 Console.WriteLine("❌ Error: Amount must be greater than 0.");
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(order.DeliveryAddress))
+            if (string.IsNullOrWhiteSpace(deliveryAddress))
             {
                 Console.WriteLine("❌ Error: Delivery address is required.");
                 return;
             }
 
-            if (!Enum.IsDefined(typeof(PaymentMethod), order.Payment))
+            if (!Enum.IsDefined(typeof(PaymentMethod), payment))
             {
                 Console.WriteLine("❌ Error: Invalid payment method.");
                 return;
             }
+
+            var order = _orderFactory.CreateOrder(productName, amount, customer, deliveryAddress, payment);
 
             _orderRepository.AddOrder(order);
             Console.WriteLine("✔ Order successfully created!");

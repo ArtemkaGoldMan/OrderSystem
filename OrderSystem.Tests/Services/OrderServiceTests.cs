@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Moq;
 using OrderSystem.Data.Interfaces;
+using OrderSystem.Factories.Interfaces;
 using OrderSystem.Models;
 using OrderSystem.Services.Implementations;
 using OrderSystem.Services.Interfaces;
@@ -12,17 +13,20 @@ namespace OrderSystem.Tests.Services
     public class OrderServiceTests : IDisposable
     {
         private readonly Mock<IOrderRepository> _mockRepo;
+        private readonly Mock<IOrderFactory> _mockFactory;  
         private readonly IOrderService _orderService;
 
         public OrderServiceTests()
         {
             _mockRepo = new Mock<IOrderRepository>(MockBehavior.Strict);
-            _orderService = new OrderService(_mockRepo.Object);
+            _mockFactory = new Mock<IOrderFactory>();
+            _orderService = new OrderService(_mockRepo.Object, _mockFactory.Object); 
         }
 
         public void Dispose()
         {
-            _mockRepo.Reset(); 
+            _mockRepo.Reset();
+            _mockFactory.Reset();
         }
 
         [Fact]
@@ -39,10 +43,13 @@ namespace OrderSystem.Tests.Services
                 Status = OrderStatus.New
             };
 
+            _mockFactory.Setup(f => f.CreateOrder(It.IsAny<string>(), It.IsAny<decimal>(), It.IsAny<CustomerType>(), It.IsAny<string>(), It.IsAny<PaymentMethod>()))
+                        .Returns(order); 
+
             _mockRepo.Setup(r => r.AddOrder(It.IsAny<Order>()));
 
             // Act
-            _orderService.CreateOrder(order);
+            _orderService.CreateOrder(order.ProductName, order.Amount, order.Customer, order.DeliveryAddress, order.Payment);
 
             // Assert
             _mockRepo.Verify(r => r.AddOrder(It.IsAny<Order>()), Times.Once);
@@ -60,8 +67,13 @@ namespace OrderSystem.Tests.Services
                 Payment = (PaymentMethod)99 // ❌ Invalid payment method
             };
 
+            _mockFactory.Setup(f => f.CreateOrder(It.IsAny<string>(), It.IsAny<decimal>(), It.IsAny<CustomerType>(), It.IsAny<string>(), It.IsAny<PaymentMethod>()))
+                        .Returns(invalidOrder);
+
+            _mockRepo.Setup(r => r.AddOrder(It.IsAny<Order>()));
+
             // Act
-            _orderService.CreateOrder(invalidOrder);
+            _orderService.CreateOrder(invalidOrder.ProductName, invalidOrder.Amount, invalidOrder.Customer, invalidOrder.DeliveryAddress, invalidOrder.Payment);
 
             // Assert
             _mockRepo.Verify(r => r.AddOrder(It.IsAny<Order>()), Times.Never);
