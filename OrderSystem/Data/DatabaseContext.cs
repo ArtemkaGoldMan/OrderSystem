@@ -7,9 +7,14 @@ namespace OrderSystem.Data
     {
         public DbSet<Order> Orders { get; set; }
 
+        public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options) { }
+
         protected override void OnConfiguring(DbContextOptionsBuilder options)
         {
-            options.UseSqlite("Data Source=orders.db");
+            if (!options.IsConfigured)
+            {
+                options.UseSqlite("Data Source=orders.db");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -29,7 +29,7 @@ namespace OrderSystem.Data.Implementations
         {
             try
             {
-                return _context.Orders.Find(id);
+                return _context.Orders.FirstOrDefault(o => o.Id == id);
             }
             catch (Exception ex)
             {
