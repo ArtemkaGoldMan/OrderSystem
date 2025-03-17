@@ -54,9 +54,6 @@ This Order Management System is a console application built with C# and .NET, de
 ```
 
 ## System Architecture
-
-The application follows Clean Architecture principles and implements several design patterns:
-
 ### Design Patterns Implemented
 1. **Repository Pattern**
    - Abstracts data access layer
