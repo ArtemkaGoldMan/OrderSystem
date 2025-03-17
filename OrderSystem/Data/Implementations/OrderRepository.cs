@@ -63,5 +63,18 @@ namespace OrderSystem.Data.Implementations
                 Console.WriteLine($"Error updating order: {ex.Message}");
             }
         }
+
+        public void DeleteOrder(Order order)
+        {
+            try
+            {
+                _context.Orders.Remove(order);
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting order: {ex.Message}");
+            }
+        }
     }
 }

@@ -15,5 +15,6 @@ namespace OrderSystem.Services.Interfaces
         void ViewOrders();
         void CancelOrder(int orderId);
         void ShowCompactOrderList();
+        void DeleteOrder(int orderId);
     }
 }

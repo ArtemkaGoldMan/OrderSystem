@@ -13,5 +13,6 @@ namespace OrderSystem.Data.Interfaces
         Order GetOrderById(int id);
         List<Order> GetAllOrders();
         void UpdateOrder(Order order);
+        void DeleteOrder(Order order);
     }
 }

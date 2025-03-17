@@ -159,7 +159,6 @@ namespace OrderSystem.Services.Implementations
 
         public void CancelOrder(int orderId)
         {
-            
             var order = _orderRepository.GetOrderById(orderId);
             if (order == null)
             {
@@ -182,6 +181,25 @@ namespace OrderSystem.Services.Implementations
             order.Status = OrderStatus.Cancelled;
             _orderRepository.UpdateOrder(order);
             Console.WriteLine("Order cancelled successfully!");
+        }
+
+        public void DeleteOrder(int orderId)
+        {
+            var order = _orderRepository.GetOrderById(orderId);
+            if (order == null)
+            {
+                Console.WriteLine("Error: Order not found.");
+                return;
+            }
+
+            if (order.Status != OrderStatus.Closed && order.Status != OrderStatus.Cancelled)
+            {
+                Console.WriteLine("Error: Can only delete orders that are closed or cancelled.");
+                return;
+            }
+
+            _orderRepository.DeleteOrder(order);
+            Console.WriteLine("Order deleted successfully!");
         }
     }
 }
