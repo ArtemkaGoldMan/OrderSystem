@@ -11,7 +11,6 @@ This Order Management System is a console application built with C# and .NET, de
 - Entity Framework Core
 - SQLite Database
 - xUnit for Testing
-- Moq for Mocking
 
 ### Project Structure
 ```
