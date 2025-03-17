@@ -110,16 +110,8 @@ class Program
             customerInput = Console.ReadLine()!;
         }
 
-        Console.Write("Enter delivery address: ");
-        string address;
-        do
-        {
-            address = Console.ReadLine()!.Trim();
-            if (string.IsNullOrEmpty(address))
-            {
-                Console.WriteLine("!!! Delivery address cannot be empty. Please enter a valid address.");
-            }
-        } while (string.IsNullOrEmpty(address));
+       Console.Write("Enter delivery address: ");
+        string address = Console.ReadLine()!;
 
         Console.Write("Enter payment method (1 - Card, 2 - Cash on Delivery): ");
         PaymentMethod paymentMethod;

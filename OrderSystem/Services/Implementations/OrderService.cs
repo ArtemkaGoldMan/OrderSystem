@@ -35,12 +35,6 @@ namespace OrderSystem.Services.Implementations
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(deliveryAddress))
-            {
-                Console.WriteLine("Error: Delivery address is required.");
-                return;
-            }
-
             if (!Enum.IsDefined(typeof(PaymentMethod), payment))
             {
                 Console.WriteLine("Error: Invalid payment method.");
