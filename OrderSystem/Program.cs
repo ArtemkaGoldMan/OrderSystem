@@ -12,7 +12,7 @@ using OrderSystem.Services.Interfaces;
 
 class Program
 {
-    private static IOrderService _orderService;
+    private static IOrderService? _orderService;
 
     static void Main()
     {
@@ -77,7 +77,7 @@ class Program
         do
         {
             Console.Write("Enter product name: ");
-            productName = Console.ReadLine().Trim();
+            productName = Console.ReadLine()!.Trim();
             if (string.IsNullOrEmpty(productName))
             {
                 Console.WriteLine("!!! Product name cannot be empty. Please enter a valid name.");
@@ -93,7 +93,7 @@ class Program
 
         Console.Write("Enter customer type (1 - Individual, 2 - Company): ");
         CustomerType customerType;
-        string customerInput = Console.ReadLine();
+        string customerInput = Console.ReadLine()!;
         while (true)
         {
             if (customerInput == "1")
@@ -107,14 +107,14 @@ class Program
                 break;
             }
             Console.Write("!!!Invalid choice. Enter 1 for Individual or 2 for Company: ");
-            customerInput = Console.ReadLine();
+            customerInput = Console.ReadLine()!;
         }
 
         Console.Write("Enter delivery address: ");
         string address;
         do
         {
-            address = Console.ReadLine().Trim();
+            address = Console.ReadLine()!.Trim();
             if (string.IsNullOrEmpty(address))
             {
                 Console.WriteLine("!!! Delivery address cannot be empty. Please enter a valid address.");
@@ -123,7 +123,7 @@ class Program
 
         Console.Write("Enter payment method (1 - Card, 2 - Cash on Delivery): ");
         PaymentMethod paymentMethod;
-        string paymentInput = Console.ReadLine();
+        string paymentInput = Console.ReadLine()!;
         while (true)
         {
             if (paymentInput == "1")
@@ -137,17 +137,17 @@ class Program
                 break;
             }
             Console.Write("!!!Invalid choice. Enter 1 for Card or 2 for Cash on Delivery: ");
-            paymentInput = Console.ReadLine();
+            paymentInput = Console.ReadLine()!;
         }
 
-        _orderService.CreateOrder(productName, amount, customerType, address, paymentMethod);
+        _orderService!.CreateOrder(productName, amount, customerType, address, paymentMethod);
         Console.WriteLine("Order created successfully! Press any key to continue...");
         Console.ReadKey();
     }
 
     static void SendToWarehouse()
     {
-        _orderService.ShowCompactOrderList();
+        _orderService!.ShowCompactOrderList();
 
         Console.Write("Enter order ID: ");
         int orderId;
@@ -162,7 +162,7 @@ class Program
 
     static void SendToShipping()
     {
-        _orderService.ShowCompactOrderList();
+        _orderService!.ShowCompactOrderList();
 
         Console.Write("Enter order ID: ");
         int orderId;
@@ -177,7 +177,7 @@ class Program
 
     static void CancelOrder()
     {
-        _orderService.ShowCompactOrderList();
+        _orderService!.ShowCompactOrderList();
 
         Console.Write("Enter order ID to cancel: ");
         int orderId;
@@ -192,7 +192,7 @@ class Program
 
     static void DeleteOrder()
     {
-        _orderService.ShowCompactOrderList();
+        _orderService!.ShowCompactOrderList();
 
         Console.Write("Enter order ID to delete: ");
         int orderId;

@@ -14,7 +14,7 @@ namespace OrderSystem.Models
 
         [Required]
         [MaxLength(100)] 
-        public string ProductName { get; set; }
+        public string? ProductName { get; set; }
 
         [Required]
         [Range(0, 999999.99)]
@@ -24,7 +24,7 @@ namespace OrderSystem.Models
         public CustomerType Customer { get; set; }
 
         [MaxLength(255)] 
-        public string DeliveryAddress { get; set; }
+        public string? DeliveryAddress { get; set; }
 
         [Required]
         public PaymentMethod Payment { get; set; }

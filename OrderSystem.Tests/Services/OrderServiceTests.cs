@@ -108,7 +108,7 @@ namespace OrderSystem.Tests.Services
         public void SendToWarehouse_Should_NotModify_When_OrderNotFound()
         {
             // Arrange
-            _mockRepo.Setup(r => r.GetOrderById(It.IsAny<int>())).Returns((Order)null);
+            _mockRepo.Setup(r => r.GetOrderById(It.IsAny<int>())).Returns((Order)null!);
 
             // Act
             _orderService.SendToWarehouse(999);
@@ -205,7 +205,7 @@ namespace OrderSystem.Tests.Services
         public void CancelOrder_Should_NotModify_When_OrderNotFound()
         {
             // Arrange
-            _mockRepo.Setup(r => r.GetOrderById(It.IsAny<int>())).Returns((Order)null);
+            _mockRepo.Setup(r => r.GetOrderById(It.IsAny<int>())).Returns((Order)null!);
 
             // Act
             _orderService.CancelOrder(999);
@@ -251,6 +251,56 @@ namespace OrderSystem.Tests.Services
             // Assert
             Assert.Equal(OrderStatus.Cancelled, order.Status);
             _mockRepo.Verify(r => r.UpdateOrder(It.IsAny<Order>()), Times.Once);
+        }
+
+        [Theory]
+        [InlineData(OrderStatus.Closed)]
+        [InlineData(OrderStatus.Cancelled)]
+        public void DeleteOrder_Should_DeleteOrder_When_ValidState(OrderStatus status)
+        {
+            // Arrange
+            var order = new Order { Id = 1, Status = status };
+            _mockRepo.Setup(r => r.GetOrderById(order.Id)).Returns(order);
+            _mockRepo.Setup(r => r.DeleteOrder(It.IsAny<Order>()));
+
+            // Act
+            _orderService.DeleteOrder(order.Id);
+
+            // Assert
+            _mockRepo.Verify(r => r.DeleteOrder(It.IsAny<Order>()), Times.Once);
+        }
+
+        [Fact]
+        public void DeleteOrder_Should_NotDelete_When_OrderNotFound()
+        {
+            // Arrange
+            _mockRepo.Setup(r => r.GetOrderById(It.IsAny<int>())).Returns((Order)null!);
+
+            // Act
+            _orderService.DeleteOrder(999);
+
+            // Assert
+            _mockRepo.Verify(r => r.DeleteOrder(It.IsAny<Order>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData(OrderStatus.New)]
+        [InlineData(OrderStatus.InWarehouse)]
+        [InlineData(OrderStatus.Error)]
+        [InlineData(OrderStatus.ReturnedToCustomer)]
+        [InlineData(OrderStatus.InShipping)]
+        public void DeleteOrder_Should_NotDelete_When_OrderInInvalidState(OrderStatus status)
+        {
+            // Arrange
+            var order = new Order { Id = 1, Status = status };
+            _mockRepo.Setup(r => r.GetOrderById(order.Id)).Returns(order);
+            _mockRepo.Setup(r => r.DeleteOrder(It.IsAny<Order>()));
+
+            // Act
+            _orderService.DeleteOrder(order.Id);
+
+            // Assert
+            _mockRepo.Verify(r => r.DeleteOrder(It.IsAny<Order>()), Times.Never);
         }
     }
 }

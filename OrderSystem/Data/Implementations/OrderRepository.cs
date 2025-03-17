@@ -29,12 +29,12 @@ namespace OrderSystem.Data.Implementations
         {
             try
             {
-                return _context.Orders.FirstOrDefault(o => o.Id == id);
+                return _context.Orders.FirstOrDefault(o => o.Id == id)!;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error fetching order by ID: {ex.Message}");
-                return null;
+                return null!;
             }
         }
 

@@ -58,10 +58,10 @@ namespace OrderSystem.Tests.Repositories
         public void AddOrder_ShouldHandleNullOrder()
         {
             // Arrange
-            Order order = null;
+            Order order = null!;
 
             // Act
-            _repository.AddOrder(order);
+            _repository.AddOrder(order!);
             var result = _repository.GetAllOrders();
 
             // Assert
@@ -175,7 +175,7 @@ namespace OrderSystem.Tests.Repositories
         public void UpdateOrder_ShouldHandleNullOrder()
         {
             // Arrange
-            Order order = null;
+            Order order = null!;
 
             // Act & Assert
             _repository.UpdateOrder(order); // Should not throw exception
@@ -194,6 +194,93 @@ namespace OrderSystem.Tests.Repositories
 
             // Act & Assert
             _repository.UpdateOrder(order); // Should not throw exception
+        }
+
+        [Fact]
+        public void DeleteOrder_ShouldRemoveOrderFromDatabase()
+        {
+            // Arrange
+            var order = new Order
+            {
+                ProductName = "Test Product",
+                Amount = 1000,
+                Customer = CustomerType.Individual,
+                DeliveryAddress = "Test Address",
+                Payment = PaymentMethod.Card,
+                Status = OrderStatus.Closed
+            };
+
+            _repository.AddOrder(order);
+            var initialCount = _repository.GetAllOrders().Count;
+
+            // Act
+            _repository.DeleteOrder(order);
+            var finalCount = _repository.GetAllOrders().Count;
+
+            // Assert
+            Assert.Equal(1, initialCount);
+            Assert.Equal(0, finalCount);
+            Assert.Null(_repository.GetOrderById(order.Id));
+        }
+
+        [Fact]
+        public void DeleteOrder_ShouldHandleNullOrder()
+        {
+            // Arrange
+            Order order = null!;
+
+            // Act & Assert
+            _repository.DeleteOrder(order); // Should not throw exception
+        }
+
+        [Fact]
+        public void DeleteOrder_ShouldHandleNonExistentOrder()
+        {
+            // Arrange
+            var order = new Order
+            {
+                Id = 999,
+                ProductName = "Non-existent",
+                Status = OrderStatus.Closed
+            };
+
+            // Act & Assert
+            _repository.DeleteOrder(order); // Should not throw exception
+        }
+
+        [Fact]
+        public void DeleteOrder_ShouldNotAffectOtherOrders()
+        {
+            // Arrange
+            var order1 = new Order
+            {
+                ProductName = "First Product",
+                Amount = 1000,
+                Customer = CustomerType.Individual,
+                DeliveryAddress = "Address 1",
+                Payment = PaymentMethod.Card,
+                Status = OrderStatus.Closed
+            };
+            var order2 = new Order
+            {
+                ProductName = "Second Product",
+                Amount = 2000,
+                Customer = CustomerType.Company,
+                DeliveryAddress = "Address 2",
+                Payment = PaymentMethod.CashOnDelivery,
+                Status = OrderStatus.Closed
+            };
+
+            _repository.AddOrder(order1);
+            _repository.AddOrder(order2);
+
+            // Act
+            _repository.DeleteOrder(order1);
+            var remainingOrders = _repository.GetAllOrders();
+
+            // Assert
+            Assert.Single(remainingOrders);
+            Assert.Equal(order2.Id, remainingOrders.First().Id);
         }
     }
 }
