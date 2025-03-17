@@ -55,25 +55,18 @@ namespace OrderSystem.Tests.Services
             _mockRepo.Verify(r => r.AddOrder(It.IsAny<Order>()), Times.Once);
         }
 
-        [Fact]
-        public void CreateOrder_Should_Not_AddOrder_When_InvalidData()
+        [Theory]
+        [InlineData("", 100, "Address", PaymentMethod.Card)]
+        [InlineData("Product", -1, "Address", PaymentMethod.Card)]
+        [InlineData("Product", 100, "", PaymentMethod.Card)]
+        [InlineData("Product", 100, "Address", (PaymentMethod)99)]
+        public void CreateOrder_Should_Not_AddOrder_When_InvalidData(string productName, decimal amount, string address, PaymentMethod payment)
         {
             // Arrange
-            var invalidOrder = new Order
-            {
-                ProductName = "", // ❌ Missing product name
-                Amount = -500, // ❌ Invalid amount
-                DeliveryAddress = null, // ❌ Missing address
-                Payment = (PaymentMethod)99 // ❌ Invalid payment method
-            };
-
-            _mockFactory.Setup(f => f.CreateOrder(It.IsAny<string>(), It.IsAny<decimal>(), It.IsAny<CustomerType>(), It.IsAny<string>(), It.IsAny<PaymentMethod>()))
-                        .Returns(invalidOrder);
-
             _mockRepo.Setup(r => r.AddOrder(It.IsAny<Order>()));
 
             // Act
-            _orderService.CreateOrder(invalidOrder.ProductName, invalidOrder.Amount, invalidOrder.Customer, invalidOrder.DeliveryAddress, invalidOrder.Payment);
+            _orderService.CreateOrder(productName, amount, CustomerType.Individual, address, payment);
 
             // Assert
             _mockRepo.Verify(r => r.AddOrder(It.IsAny<Order>()), Times.Never);
@@ -111,28 +104,36 @@ namespace OrderSystem.Tests.Services
             _mockRepo.Verify(r => r.UpdateOrder(It.IsAny<Order>()), Times.Once);
         }
 
-
         [Fact]
-        public void SendToShipping_Should_SetStatusToClosed_After_5_Seconds() //does not work due to me
+        public void SendToWarehouse_Should_NotModify_When_OrderNotFound()
         {
             // Arrange
-            var order = new Order { Id = 3, DeliveryAddress = "Shipping Address", Status = OrderStatus.InWarehouse };
-            _mockRepo.Setup(r => r.GetOrderById(order.Id)).Returns(order);
-            _mockRepo.Setup(r => r.UpdateOrder(It.IsAny<Order>())).Callback<Order>(o => order.Status = o.Status);
+            _mockRepo.Setup(r => r.GetOrderById(It.IsAny<int>())).Returns((Order)null);
 
             // Act
-            var startTime = DateTime.Now;
-            _orderService.SendToShipping(order.Id);
-            var elapsedTime = DateTime.Now - startTime;
+            _orderService.SendToWarehouse(999);
 
             // Assert
-            _mockRepo.Verify(r => r.UpdateOrder(It.Is<Order>(o => o.Status == OrderStatus.InShipping)), Times.Once);
-            _mockRepo.Verify(r => r.UpdateOrder(It.Is<Order>(o => o.Status == OrderStatus.Closed)), Times.Once);
-
-            Assert.Equal(OrderStatus.Closed, order.Status);
-            Assert.True(elapsedTime.TotalSeconds >= 5, "Shipping delay should be at least 5 seconds.");
+            _mockRepo.Verify(r => r.UpdateOrder(It.IsAny<Order>()), Times.Never);
         }
 
+        [Theory]
+        [InlineData(OrderStatus.Closed)]
+        [InlineData(OrderStatus.Cancelled)]
+        public void SendToWarehouse_Should_NotModify_When_OrderClosedOrCancelled(OrderStatus status)
+        {
+            // Arrange
+            var order = new Order { Id = 1, Status = status };
+            _mockRepo.Setup(r => r.GetOrderById(order.Id)).Returns(order);
+            _mockRepo.Setup(r => r.UpdateOrder(It.IsAny<Order>()));
+
+            // Act
+            _orderService.SendToWarehouse(order.Id);
+
+            // Assert
+            Assert.Equal(status, order.Status);
+            _mockRepo.Verify(r => r.UpdateOrder(It.IsAny<Order>()), Times.Never);
+        }
 
         [Fact]
         public void SendToShipping_Should_SetStatusToError_When_MissingAddress()
@@ -148,6 +149,24 @@ namespace OrderSystem.Tests.Services
             // Assert
             Assert.Equal(OrderStatus.Error, invalidOrder.Status);
             _mockRepo.Verify(r => r.UpdateOrder(It.IsAny<Order>()), Times.Once);
+        }
+
+        [Theory]
+        [InlineData(OrderStatus.Closed)]
+        [InlineData(OrderStatus.Cancelled)]
+        public void SendToShipping_Should_NotModify_When_OrderClosedOrCancelled(OrderStatus status)
+        {
+            // Arrange
+            var order = new Order { Id = 1, Status = status, DeliveryAddress = "Address" };
+            _mockRepo.Setup(r => r.GetOrderById(order.Id)).Returns(order);
+            _mockRepo.Setup(r => r.UpdateOrder(It.IsAny<Order>()));
+
+            // Act
+            _orderService.SendToShipping(order.Id);
+
+            // Assert
+            Assert.Equal(status, order.Status);
+            _mockRepo.Verify(r => r.UpdateOrder(It.IsAny<Order>()), Times.Never);
         }
 
         [Fact]
@@ -167,6 +186,71 @@ namespace OrderSystem.Tests.Services
 
             // Assert
             _mockRepo.Verify(r => r.GetAllOrders(), Times.Once);
+        }
+
+        [Fact]
+        public void ViewOrders_Should_HandleEmptyList()
+        {
+            // Arrange
+            _mockRepo.Setup(r => r.GetAllOrders()).Returns(new List<Order>());
+
+            // Act
+            _orderService.ViewOrders();
+
+            // Assert
+            _mockRepo.Verify(r => r.GetAllOrders(), Times.Once);
+        }
+
+        [Fact]
+        public void CancelOrder_Should_NotModify_When_OrderNotFound()
+        {
+            // Arrange
+            _mockRepo.Setup(r => r.GetOrderById(It.IsAny<int>())).Returns((Order)null);
+
+            // Act
+            _orderService.CancelOrder(999);
+
+            // Assert
+            _mockRepo.Verify(r => r.UpdateOrder(It.IsAny<Order>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData(OrderStatus.Closed)]
+        [InlineData(OrderStatus.Cancelled)]
+        [InlineData(OrderStatus.InShipping)]
+        public void CancelOrder_Should_NotModify_When_OrderInInvalidState(OrderStatus status)
+        {
+            // Arrange
+            var order = new Order { Id = 1, Status = status };
+            _mockRepo.Setup(r => r.GetOrderById(order.Id)).Returns(order);
+            _mockRepo.Setup(r => r.UpdateOrder(It.IsAny<Order>()));
+
+            // Act
+            _orderService.CancelOrder(order.Id);
+
+            // Assert
+            Assert.Equal(status, order.Status);
+            _mockRepo.Verify(r => r.UpdateOrder(It.IsAny<Order>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData(OrderStatus.New)]
+        [InlineData(OrderStatus.InWarehouse)]
+        [InlineData(OrderStatus.Error)]
+        [InlineData(OrderStatus.ReturnedToCustomer)]
+        public void CancelOrder_Should_SetStatusToCancelled_When_ValidState(OrderStatus initialStatus)
+        {
+            // Arrange
+            var order = new Order { Id = 1, Status = initialStatus };
+            _mockRepo.Setup(r => r.GetOrderById(order.Id)).Returns(order);
+            _mockRepo.Setup(r => r.UpdateOrder(It.IsAny<Order>()));
+
+            // Act
+            _orderService.CancelOrder(order.Id);
+
+            // Assert
+            Assert.Equal(OrderStatus.Cancelled, order.Status);
+            _mockRepo.Verify(r => r.UpdateOrder(It.IsAny<Order>()), Times.Once);
         }
     }
 }

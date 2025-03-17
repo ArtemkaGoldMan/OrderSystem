@@ -55,6 +55,20 @@ namespace OrderSystem.Tests.Repositories
         }
 
         [Fact]
+        public void AddOrder_ShouldHandleNullOrder()
+        {
+            // Arrange
+            Order order = null;
+
+            // Act
+            _repository.AddOrder(order);
+            var result = _repository.GetAllOrders();
+
+            // Assert
+            Assert.Empty(result);
+        }
+
+        [Fact]
         public void GetOrderById_ShouldReturnCorrectOrder()
         {
             // Arrange
@@ -76,6 +90,16 @@ namespace OrderSystem.Tests.Repositories
             // Assert
             Assert.NotNull(result);
             Assert.Equal("Laptop", result.ProductName);
+        }
+
+        [Fact]
+        public void GetOrderById_ShouldReturnNull_WhenOrderDoesNotExist()
+        {
+            // Act
+            var result = _repository.GetOrderById(999);
+
+            // Assert
+            Assert.Null(result);
         }
 
         [Fact]
@@ -110,6 +134,16 @@ namespace OrderSystem.Tests.Repositories
         }
 
         [Fact]
+        public void GetAllOrders_ShouldReturnEmptyList_WhenNoOrders()
+        {
+            // Act
+            var result = _repository.GetAllOrders();
+
+            // Assert
+            Assert.Empty(result);
+        }
+
+        [Fact]
         public void UpdateOrder_ShouldModifyExistingOrder()
         {
             // Arrange
@@ -135,6 +169,31 @@ namespace OrderSystem.Tests.Repositories
             // Assert
             Assert.NotNull(updatedOrder);
             Assert.Equal(OrderStatus.InWarehouse, updatedOrder.Status);
+        }
+
+        [Fact]
+        public void UpdateOrder_ShouldHandleNullOrder()
+        {
+            // Arrange
+            Order order = null;
+
+            // Act & Assert
+            _repository.UpdateOrder(order); // Should not throw exception
+        }
+
+        [Fact]
+        public void UpdateOrder_ShouldHandleNonExistentOrder()
+        {
+            // Arrange
+            var order = new Order
+            {
+                Id = 999,
+                ProductName = "Non-existent",
+                Status = OrderStatus.New
+            };
+
+            // Act & Assert
+            _repository.UpdateOrder(order); // Should not throw exception
         }
     }
 }

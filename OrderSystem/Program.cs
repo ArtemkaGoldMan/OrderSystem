@@ -69,8 +69,16 @@ class Program
 
     static void CreateOrder()
     {
-        Console.Write("Enter product name: ");
-        string productName = Console.ReadLine();
+        string productName;
+        do
+        {
+            Console.Write("Enter product name: ");
+            productName = Console.ReadLine().Trim();
+            if (string.IsNullOrEmpty(productName))
+            {
+                Console.WriteLine("!!! Product name cannot be empty. Please enter a valid name.");
+            }
+        } while (string.IsNullOrEmpty(productName));
 
         Console.Write("Enter amount: ");
         decimal amount;
@@ -98,9 +106,16 @@ class Program
             customerInput = Console.ReadLine();
         }
 
-
         Console.Write("Enter delivery address: ");
-        string address = Console.ReadLine();
+        string address;
+        do
+        {
+            address = Console.ReadLine().Trim();
+            if (string.IsNullOrEmpty(address))
+            {
+                Console.WriteLine("!!! Delivery address cannot be empty. Please enter a valid address.");
+            }
+        } while (string.IsNullOrEmpty(address));
 
         Console.Write("Enter payment method (1 - Card, 2 - Cash on Delivery): ");
         PaymentMethod paymentMethod;

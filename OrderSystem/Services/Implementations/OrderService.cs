@@ -48,7 +48,6 @@ namespace OrderSystem.Services.Implementations
             }
 
             var order = _orderFactory.CreateOrder(productName, amount, customer, deliveryAddress, payment);
-
             _orderRepository.AddOrder(order);
             Console.WriteLine("Order successfully created!");
         }
